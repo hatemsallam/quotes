@@ -3,8 +3,12 @@
  */
 package quotes;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -12,6 +16,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AppTest {
+    AppTest() throws IOException {
+    }
+
     @Test
 
      void GSONTest() {
@@ -20,5 +27,14 @@ class AppTest {
         List<Quote> quotes= App.quoteCollector(path);
         assertEquals(quotes.size() ,App.quoteCollector(path).size());
 
+    }
+
+
+    String url = "http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en";
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        int responseCode = connection.getResponseCode();
+    @Test
+    public void testConnection()  {
+        Assertions.assertEquals(200 , responseCode);
     }
 }

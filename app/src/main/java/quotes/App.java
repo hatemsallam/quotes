@@ -7,9 +7,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,10 +21,50 @@ public class App {
 
 
     public static void main(String[] args) {
+//        Path path = Paths.get("app/src/main/resources/recentquotes.json");
+//        List<Quote> quotes = quoteCollector(path);
+//        System.out.println(randomQuote(quotes));
+
+        String url = "http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en";
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                System.out.println(connection);
+
+                InputStreamReader inputStreamReader = new InputStreamReader(connection.getInputStream());
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                // this data is the JSON
+                String data = bufferedReader.readLine();
+//                System.out.println(data);
+
+                bufferedReader.close();
+
+                Gson gson = new Gson();
+                ApiQuote apiQuote = gson.fromJson(data, ApiQuote.class);
+                System.out.println(apiQuote);
+
+                BufferedWriter writer = new BufferedWriter(new FileWriter("app/src/main/resources/ApiQuotes.json"));
+                gson.toJson(apiQuote, writer);
+                writer.close();
+
+            } else {
+                System.out.println("server error");
         Path path = Paths.get("app/src/main/resources/recentquotes.json");
         List<Quote> quotes = quoteCollector(path);
         System.out.println(randomQuote(quotes));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
+
+
+
 
     public static Quote randomQuote(List<Quote> quotes){
         Random random = new Random();
@@ -47,5 +88,7 @@ public class App {
         }
         return quotes;
     }
+
+
 
 }

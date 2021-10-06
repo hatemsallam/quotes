@@ -1,6 +1,6 @@
 ## <--Description-->
 
-- An application That reads a json file and generates random quotes to the user .
+application will read data from API and respond with a random quote and display it to the user, if offline it will read from A local JSON file and display a random quote from it .
 
 
 
